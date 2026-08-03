@@ -124,6 +124,21 @@
     ],
     "request_extra_body": {}
   },
+  "qwen35-122b-a10b-fp8": {
+    "model_id": "Qwen/Qwen3.5-122B-A10B-FP8",
+    "architecture": "moe",
+    "total_parameters_b": 122,
+    "active_parameters_b": 10,
+    "precision": "FP8",
+    "recommended_tensor_parallel_size": 1,
+    "vllm_args": [
+      "--max-model-len", "4096",
+      "--language-model-only"
+    ],
+    "request_extra_body": {
+      "chat_template_kwargs": {"enable_thinking": false}
+    }
+  },
   "glm45-air-fp8": {
     "model_id": "zai-org/GLM-4.5-Air-FP8",
     "architecture": "moe",

@@ -66,6 +66,8 @@ Available model keys are:
 The configured keys are `qwen35-0.8b`, `qwen35-2b`, `qwen35-4b`,
 `qwen35-9b`, `qwen35-27b`, `glm47-flash`, `qwen35-35b-a3b`,
 `kimi-linear-48b-a3b`, and `glm45-air-fp8`.
+The additional `qwen35-122b-a10b-fp8` key is the recommended large-model
+checkpoint for a single B300.
 
 ## GPU count and memory
 
@@ -88,6 +90,7 @@ the number of weights that must reside in aggregate GPU memory.
 | `glm47-flash` | BF16 | 2 | Two GPUs; about 60 GB of weights in aggregate before overhead |
 | `qwen35-35b-a3b` | BF16 | 2 | Two GPUs; about 70 GB of weights in aggregate before overhead |
 | `kimi-linear-48b-a3b` | BF16 | 4 | Four GPUs, matching the publisher's vLLM example |
+| `qwen35-122b-a10b-fp8` | FP8 | 1 | One B300 288 GB; text-only mode and 4K context |
 | `glm45-air-fp8` | FP8 | 4 | Four 80 GB GPUs; test the dry launch before renting a long job |
 
 The four-GPU Kimi default follows the publisher's

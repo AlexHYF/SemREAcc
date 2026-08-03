@@ -72,7 +72,7 @@ class MetricTests(unittest.TestCase):
 class ManifestTests(unittest.TestCase):
     def test_all_requested_models_build_vllm_commands(self) -> None:
         models = json.loads((ROOT / "configs" / "models.json").read_text())
-        self.assertEqual(len(models), 9)
+        self.assertEqual(len(models), 10)
         for config in models.values():
             command = serve_model.build_command(
                 config,
