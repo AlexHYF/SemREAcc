@@ -1,0 +1,141 @@
+{
+  "qwen35-0.8b": {
+    "model_id": "Qwen/Qwen3.5-0.8B",
+    "architecture": "dense",
+    "total_parameters_b": 0.8,
+    "active_parameters_b": 0.8,
+    "precision": "BF16",
+    "recommended_tensor_parallel_size": 1,
+    "vllm_args": [
+      "--dtype", "bfloat16",
+      "--max-model-len", "4096",
+      "--language-model-only"
+    ],
+    "request_extra_body": {
+      "chat_template_kwargs": {"enable_thinking": false}
+    }
+  },
+  "qwen35-2b": {
+    "model_id": "Qwen/Qwen3.5-2B",
+    "architecture": "dense",
+    "total_parameters_b": 2,
+    "active_parameters_b": 2,
+    "precision": "BF16",
+    "recommended_tensor_parallel_size": 1,
+    "vllm_args": [
+      "--dtype", "bfloat16",
+      "--max-model-len", "4096",
+      "--language-model-only"
+    ],
+    "request_extra_body": {
+      "chat_template_kwargs": {"enable_thinking": false}
+    }
+  },
+  "qwen35-4b": {
+    "model_id": "Qwen/Qwen3.5-4B",
+    "architecture": "dense",
+    "total_parameters_b": 4,
+    "active_parameters_b": 4,
+    "precision": "BF16",
+    "recommended_tensor_parallel_size": 1,
+    "vllm_args": [
+      "--dtype", "bfloat16",
+      "--max-model-len", "4096",
+      "--language-model-only"
+    ],
+    "request_extra_body": {
+      "chat_template_kwargs": {"enable_thinking": false}
+    }
+  },
+  "qwen35-9b": {
+    "model_id": "Qwen/Qwen3.5-9B",
+    "architecture": "dense",
+    "total_parameters_b": 9,
+    "active_parameters_b": 9,
+    "precision": "BF16",
+    "recommended_tensor_parallel_size": 1,
+    "vllm_args": [
+      "--dtype", "bfloat16",
+      "--max-model-len", "4096",
+      "--language-model-only"
+    ],
+    "request_extra_body": {
+      "chat_template_kwargs": {"enable_thinking": false}
+    }
+  },
+  "qwen35-27b": {
+    "model_id": "Qwen/Qwen3.5-27B",
+    "architecture": "dense",
+    "total_parameters_b": 27,
+    "active_parameters_b": 27,
+    "precision": "BF16",
+    "recommended_tensor_parallel_size": 1,
+    "vllm_args": [
+      "--dtype", "bfloat16",
+      "--max-model-len", "4096",
+      "--language-model-only"
+    ],
+    "request_extra_body": {
+      "chat_template_kwargs": {"enable_thinking": false}
+    }
+  },
+  "glm47-flash": {
+    "model_id": "zai-org/GLM-4.7-Flash",
+    "architecture": "moe",
+    "total_parameters_b": 30,
+    "active_parameters_b": 3,
+    "precision": "BF16",
+    "recommended_tensor_parallel_size": 2,
+    "vllm_args": [
+      "--dtype", "bfloat16",
+      "--max-model-len", "4096"
+    ],
+    "request_extra_body": {
+      "chat_template_kwargs": {"enable_thinking": false}
+    }
+  },
+  "qwen35-35b-a3b": {
+    "model_id": "Qwen/Qwen3.5-35B-A3B",
+    "architecture": "moe",
+    "total_parameters_b": 35,
+    "active_parameters_b": 3,
+    "precision": "BF16",
+    "recommended_tensor_parallel_size": 2,
+    "vllm_args": [
+      "--dtype", "bfloat16",
+      "--max-model-len", "4096",
+      "--language-model-only"
+    ],
+    "request_extra_body": {
+      "chat_template_kwargs": {"enable_thinking": false}
+    }
+  },
+  "kimi-linear-48b-a3b": {
+    "model_id": "moonshotai/Kimi-Linear-48B-A3B-Instruct",
+    "architecture": "moe",
+    "total_parameters_b": 48,
+    "active_parameters_b": 3,
+    "precision": "BF16",
+    "recommended_tensor_parallel_size": 4,
+    "vllm_args": [
+      "--dtype", "bfloat16",
+      "--max-model-len", "4096",
+      "--trust-remote-code"
+    ],
+    "request_extra_body": {}
+  },
+  "glm45-air-fp8": {
+    "model_id": "zai-org/GLM-4.5-Air-FP8",
+    "architecture": "moe",
+    "total_parameters_b": 106,
+    "active_parameters_b": 12,
+    "precision": "FP8",
+    "recommended_tensor_parallel_size": 4,
+    "vllm_args": [
+      "--max-model-len", "4096"
+    ],
+    "request_extra_body": {
+      "chat_template_kwargs": {"enable_thinking": false}
+    }
+  }
+}
