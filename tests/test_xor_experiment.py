@@ -3,6 +3,7 @@ from __future__ import annotations
 from contextlib import redirect_stdout
 import io
 import json
+import os
 from pathlib import Path
 import sys
 import tempfile
@@ -83,6 +84,27 @@ class ManifestTests(unittest.TestCase):
             )
             self.assertEqual(command[:2], ["vllm", "serve"])
             self.assertIn(config["model_id"], command)
+
+    def test_finds_vllm_beside_virtualenv_python(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            bin_dir = Path(temporary) / "bin"
+            bin_dir.mkdir()
+            python = bin_dir / "python"
+            vllm = bin_dir / "vllm"
+            python.touch()
+            vllm.touch(mode=0o755)
+            with patch.object(serve_model.shutil, "which", return_value=None), patch.object(
+                serve_model.sys, "executable", str(python)
+            ):
+                self.assertEqual(serve_model.find_vllm_executable(), str(vllm))
+
+    def test_builds_transformers_serve_command(self) -> None:
+        config = {"model_id": "Qwen/Qwen3.5-4B"}
+        command = serve_model.build_transformers_command(
+            config, host="0.0.0.0", port=8000, extra_args=[]
+        )
+        self.assertEqual(command[:3], ["transformers", "serve", config["model_id"]])
+        self.assertIn("--continuous-batching", command)
 
 
 class EndToEndTests(unittest.TestCase):

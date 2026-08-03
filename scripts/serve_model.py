@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Launch one configured model with vLLM's OpenAI-compatible server."""
+"""Launch one configured model with an OpenAI-compatible local server."""
 
 from __future__ import annotations
 
@@ -50,9 +50,72 @@ def build_command(
     ]
 
 
+def build_transformers_command(
+    config: dict,
+    host: str,
+    port: int,
+    extra_args: list[str],
+) -> list[str]:
+    return [
+        "transformers",
+        "serve",
+        config["model_id"],
+        "--host",
+        host,
+        "--port",
+        str(port),
+        "--continuous-batching",
+        "--dtype",
+        "bfloat16",
+        *config.get("transformers_args", []),
+        *extra_args,
+    ]
+
+
+def find_executable(name: str) -> str | None:
+    """Find an executable globally or beside the active virtualenv's Python."""
+    on_path = shutil.which(name)
+    if on_path:
+        return on_path
+    virtualenv_candidate = Path(sys.executable).parent / name
+    if virtualenv_candidate.is_file() and os.access(virtualenv_candidate, os.X_OK):
+        return str(virtualenv_candidate)
+    return None
+
+
+def find_vllm_executable() -> str | None:
+    """Backward-compatible helper used by tests and callers."""
+    return find_executable("vllm")
+
+
+def select_backend() -> str:
+    requested = os.getenv("INFERENCE_BACKEND")
+    if requested:
+        backend = requested.strip().lower()
+    else:
+        marker = Path(sys.executable).parent.parent / ".semre_backend"
+        backend = (
+            marker.read_text(encoding="utf-8").strip().lower()
+            if marker.is_file()
+            else "auto"
+        )
+    if backend == "auto":
+        if find_executable("vllm"):
+            return "vllm"
+        if find_executable("transformers"):
+            return "transformers"
+        raise SystemExit(
+            "Neither vllm nor transformers serve is installed. "
+            "Run scripts/bootstrap_vllm.sh first."
+        )
+    if backend not in {"vllm", "transformers"}:
+        raise SystemExit("INFERENCE_BACKEND must be vllm or transformers")
+    return backend
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Launch a model from configs/models.json using vLLM."
+        description="Launch a model from configs/models.json."
     )
     parser.add_argument("model_key", nargs="?", help="Short model key from the manifest")
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
@@ -69,7 +132,7 @@ def parse_args() -> argparse.Namespace:
     args, extra_args = parser.parse_known_args()
     if extra_args and extra_args[0] == "--":
         extra_args = extra_args[1:]
-    args.vllm_extra_args = extra_args
+    args.server_extra_args = extra_args
     return args
 
 
@@ -99,15 +162,26 @@ def main() -> int:
     if tp_size < 1:
         raise SystemExit("Tensor-parallel size must be at least 1")
 
-    command = build_command(config, args.host, args.port, tp_size, args.vllm_extra_args)
+    backend = select_backend()
+    if backend == "vllm":
+        command = build_command(config, args.host, args.port, tp_size, args.server_extra_args)
+    else:
+        if tp_size != 1:
+            raise SystemExit("The Transformers fallback supports only TP_SIZE=1")
+        command = build_transformers_command(
+            config, args.host, args.port, args.server_extra_args
+        )
     print(shlex.join(command), flush=True)
     if args.dry_run:
         return 0
-    if shutil.which("vllm") is None:
+    executable = find_executable(command[0])
+    if executable is None:
         raise SystemExit(
-            "vllm is not installed or is not on PATH. Run scripts/bootstrap_vllm.sh first."
+            f"{command[0]} is not installed or is not on PATH. "
+            "Run scripts/bootstrap_vllm.sh first."
         )
-    os.execvp(command[0], command)
+    command[0] = executable
+    os.execv(command[0], command)
     return 0
 
 
