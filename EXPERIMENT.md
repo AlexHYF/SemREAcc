@@ -38,10 +38,9 @@ The wrapper records the selected serving backend inside `.venv`, so the same
 retained as a slow compatibility fallback using Hugging Face's lightweight
 OpenAI-compatible `transformers serve`.
 
-The newer-CUDA path uses vLLM nightly because the current
-[Qwen3.5 instructions](https://huggingface.co/Qwen/Qwen3.5-4B#vllm) and
-[GLM-4.7-Flash instructions](https://huggingface.co/zai-org/GLM-4.7-Flash#vllm)
-require vLLM main/nightly; GLM-4.7 also currently requires Transformers main.
+The CUDA 12.9 path uses the stable vLLM release; the CUDA 13.0 variant still
+uses vLLM nightly. Transformers main is installed for the latest model
+definitions used by Qwen3.5 and GLM-4.7-Flash.
 
 Put Hugging Face downloads on the provider's persistent volume when possible.
 For example, on a RunPod volume mounted at `/workspace`:

@@ -47,13 +47,24 @@ case "$cuda_variant" in
       'requests>=2.32'
     printf '%s\n' transformers > .venv/.semre_backend
     ;;
-  cu129|cu130)
-    # Qwen3.5 and GLM-4.7-Flash require a recent vLLM build. Pin both the
-    # PyTorch backend and nightly wheel index to the same CUDA ABI.
+  cu129)
+    # Stable vLLM wheels now use CUDA 12.9 by default. Avoid the nightly
+    # index here: it can temporarily contain a wheel for only one CPU
+    # architecture while a nightly release is being published.
     uv pip install --python .venv/bin/python \
       vllm \
-      --torch-backend="$cuda_variant" \
-      --extra-index-url="https://wheels.vllm.ai/nightly/$cuda_variant"
+      --torch-backend=cu129
+    uv pip install --python .venv/bin/python \
+      'git+https://github.com/huggingface/transformers.git@main'
+    printf '%s\n' vllm > .venv/.semre_backend
+    ;;
+  cu130)
+    # CUDA 13.0 remains an alternate vLLM build, so use its CUDA-specific
+    # nightly index and keep the PyTorch and vLLM CUDA ABIs aligned.
+    uv pip install --python .venv/bin/python \
+      vllm \
+      --torch-backend=cu130 \
+      --extra-index-url=https://wheels.vllm.ai/nightly/cu130
     uv pip install --python .venv/bin/python \
       'git+https://github.com/huggingface/transformers.git@main'
     printf '%s\n' vllm > .venv/.semre_backend
@@ -62,8 +73,7 @@ case "$cuda_variant" in
     # Fall back to uv's accelerator detection when nvidia-smi is unavailable.
     uv pip install --python .venv/bin/python \
       vllm \
-      --torch-backend=auto \
-      --extra-index-url=https://wheels.vllm.ai/nightly
+      --torch-backend=auto
     uv pip install --python .venv/bin/python \
       'git+https://github.com/huggingface/transformers.git@main'
     printf '%s\n' vllm > .venv/.semre_backend
