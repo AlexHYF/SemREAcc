@@ -181,6 +181,12 @@ def main() -> int:
             "Run scripts/bootstrap_vllm.sh first."
         )
     command[0] = executable
+    # Make helpers installed beside the virtualenv Python (notably ninja,
+    # which FlashInfer invokes for JIT compilation) visible to subprocesses.
+    virtualenv_bin = str(Path(sys.executable).parent)
+    os.environ["PATH"] = os.pathsep.join(
+        part for part in (virtualenv_bin, os.environ.get("PATH")) if part
+    )
     os.execv(command[0], command)
     return 0
 

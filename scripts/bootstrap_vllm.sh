@@ -84,6 +84,11 @@ case "$cuda_variant" in
     ;;
 esac
 
+if [[ "$cuda_variant" != "cu124" ]]; then
+  # FlashInfer may JIT-compile GPU kernels during vLLM startup.
+  uv pip install --python .venv/bin/python 'ninja>=1.11'
+fi
+
 if [[ "$cuda_variant" == "cu124" ]]; then
   .venv/bin/python - <<'PY'
 import torch

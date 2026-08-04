@@ -73,6 +73,7 @@
     "vllm_args": [
       "--dtype", "bfloat16",
       "--max-model-len", "4096",
+      "--max-num-seqs", "256",
       "--language-model-only"
     ],
     "request_extra_body": {
