@@ -28,8 +28,7 @@ if [[ "$cuda_variant" == "auto" ]] && command -v nvidia-smi >/dev/null 2>&1; the
     's/.*CUDA Version: \([0-9][0-9.]*\).*/\1/p' | head -n 1)"
   case "$detected_cuda" in
     13.*) cuda_variant="cu130" ;;
-    12.9*) cuda_variant="cu129" ;;
-    12.*) cuda_variant="cu124" ;;
+    12.*) cuda_variant="cu129" ;;
   esac
 fi
 
@@ -37,13 +36,15 @@ case "$cuda_variant" in
   cu124)
     # Current vLLM wheels no longer target CUDA 12.4, while the older cu124
     # vLLM releases predate Qwen3.5. Use Transformers' OpenAI-compatible
-    # evaluation server with the last official PyTorch cu124 wheel instead.
+    # evaluation server only when this compatibility fallback is requested
+    # explicitly. CUDA 12.x hosts normally use the faster cu129 vLLM path.
     uv pip install --python .venv/bin/python \
       torch==2.6.0 \
       torchvision==0.21.0 \
       --index-url https://download.pytorch.org/whl/cu124
     uv pip install --python .venv/bin/python \
-      'transformers[serving] @ git+https://github.com/huggingface/transformers.git@main'
+      'transformers[serving] @ git+https://github.com/huggingface/transformers.git@main' \
+      'requests>=2.32'
     printf '%s\n' transformers > .venv/.semre_backend
     ;;
   cu129|cu130)

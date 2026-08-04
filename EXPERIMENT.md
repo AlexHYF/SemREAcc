@@ -23,20 +23,20 @@ cd SemREAcc
 scripts/bootstrap_vllm.sh
 ```
 
-The bootstrap reads the maximum CUDA version reported by `nvidia-smi`. CUDA
-12.4--12.8 machines use PyTorch 2.6.0 cu124 plus Hugging Face's lightweight
-OpenAI-compatible `transformers serve`; CUDA 12.9 and CUDA 13 machines use the
-matching vLLM nightly wheel. Override detection explicitly when needed:
+The bootstrap reads the maximum CUDA version reported by `nvidia-smi`. All
+CUDA 12.x machines use the CUDA 12.9 vLLM wheel via NVIDIA's minor-version
+compatibility; CUDA 13 machines use the CUDA 13 vLLM wheel. Override detection
+explicitly when needed:
 
 ```bash
-SEMRE_CUDA_VARIANT=cu124 scripts/bootstrap_vllm.sh  # RTX 4090 / CUDA 12.4
+SEMRE_CUDA_VARIANT=cu129 scripts/bootstrap_vllm.sh  # RTX 4090 / CUDA 12.x
 SEMRE_CUDA_VARIANT=cu130 scripts/bootstrap_vllm.sh  # B300 / CUDA 13
 ```
 
 The wrapper records the selected serving backend inside `.venv`, so the same
-`run_model_experiment.sh` command works for both. The CUDA 12.4 fallback is
-intended for the small, single-GPU Qwen models; it is slower than vLLM but keeps
-the experimental protocol and OpenAI-compatible API unchanged.
+`run_model_experiment.sh` command works for both. An explicit `cu124` option is
+retained as a slow compatibility fallback using Hugging Face's lightweight
+OpenAI-compatible `transformers serve`.
 
 The newer-CUDA path uses vLLM nightly because the current
 [Qwen3.5 instructions](https://huggingface.co/Qwen/Qwen3.5-4B#vllm) and
