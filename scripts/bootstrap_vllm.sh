@@ -20,7 +20,10 @@ if ! command -v "$python_bin" >/dev/null 2>&1; then
 fi
 
 "$python_bin" -m pip install --upgrade uv
-uv venv .venv --python "$python_bin"
+# The serving environment is disposable. Clear it so switching between CUDA
+# variants cannot leave a CUDA 13 torch/vLLM wheel in a CUDA 12 environment (or
+# vice versa). Hugging Face model downloads live outside .venv and are retained.
+uv venv --clear .venv --python "$python_bin"
 
 cuda_variant="${SEMRE_CUDA_VARIANT:-auto}"
 if [[ "$cuda_variant" == "auto" ]] && command -v nvidia-smi >/dev/null 2>&1; then
