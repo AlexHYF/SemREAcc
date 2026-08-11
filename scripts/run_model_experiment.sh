@@ -18,7 +18,7 @@ cd "$repo_root"
 python_bin="${PYTHON_BIN:-$repo_root/.venv/bin/python}"
 port="${PORT:-8000}"
 server_timeout="${SERVER_START_TIMEOUT:-7200}"
-server_log="$repo_root/results/$model_key/server.log"
+server_log="${SERVER_LOG:-$repo_root/results/$model_key/server.log}"
 base_url="${OPENAI_BASE_URL:-http://127.0.0.1:$port/v1}"
 mkdir -p "$(dirname "$server_log")"
 

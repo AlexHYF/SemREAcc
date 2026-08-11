@@ -78,8 +78,9 @@ Available model keys are:
 ```
 
 The configured keys are `qwen35-0.8b`, `qwen35-2b`, `qwen35-4b`,
-`qwen35-9b`, `qwen35-27b`, `glm47-flash`, `qwen35-35b-a3b`,
-`kimi-linear-48b-a3b`, and `glm45-air-fp8`.
+`phi4-mini-3.8b`, `ministral3-3b`, `qwen35-9b`, `qwen35-27b`,
+`glm47-flash`, `qwen35-35b-a3b`, `kimi-linear-48b-a3b`, and
+`glm45-air-fp8`.
 The additional `qwen35-122b-a10b-fp8` key is the recommended large-model
 checkpoint for a single B300.
 
@@ -100,6 +101,7 @@ the number of weights that must reside in aggregate GPU memory.
 | Model key | Stored precision | Default GPUs | Practical starting point |
 |---|---:|---:|---|
 | `qwen35-0.8b` / `2b` / `4b` / `9b` | BF16 | 1 | One modern 24--48 GB GPU |
+| `ministral3-3b` / `phi4-mini-3.8b` | BF16 | 1 | One modern 24--48 GB GPU |
 | `qwen35-27b` | BF16 | 1 | One 80 GB GPU, or use `TP_SIZE=2` on smaller GPUs |
 | `glm47-flash` | BF16 | 2 | Two GPUs; about 60 GB of weights in aggregate before overhead |
 | `qwen35-35b-a3b` | BF16 | 2 | Two GPUs; about 70 GB of weights in aggregate before overhead |
@@ -210,12 +212,73 @@ the raw JSONL files for auditing: romanized names can be cross-cultural, so the
 model's disagreement with the source-list labels can reflect benchmark
 ambiguity as well as classifier error.
 
+## Three similarly sized small-model voting experiment
+
+To test whether several small local models improve accuracy without confounding
+the vote with a large capacity difference, use three instruction models from
+different families but a narrow 3--4B parameter range:
+
+| Model key | Checkpoint | Parameters |
+|---|---|---:|
+| `qwen35-4b` | `Qwen/Qwen3.5-4B` | 4.0B |
+| `phi4-mini-3.8b` | `microsoft/Phi-4-mini-instruct` | 3.8B |
+| `ministral3-3b` | `mistralai/Ministral-3-3B-Instruct-2512-BF16` | 4.0B total |
+
+Each model independently runs the unchanged direct and component benchmarks on
+all 4,000 core rows. The different model families make error diversity more
+plausible, while their similar sizes make the majority vote easier to interpret.
+
+The offline evaluator reports three pre-specified equal-vote ensembles:
+
+1. `direct_majority`: majority vote over the three whole-name answers.
+2. `component_majority`: each model evaluates the component SemRE, followed by
+   a majority vote over the three final Boolean results.
+3. `oracle_majority_component`: majority vote on each atomic name predicate,
+   followed by evaluation of the component SemRE. This is the primary
+   ensemble-LLM-oracle condition.
+
+Use a strict two-of-three majority. An invalid answer is not silently converted
+to `NO`; an ensemble answer is valid only when at least two models produce the
+same Boolean label. No inference calls are needed after the three ordinary
+model runs. Evaluate improvement against the best individual model, and inspect
+accuracy, false-positive rate, exact paired McNemar comparisons, and pairwise
+disagreement. Low disagreement means voting has little diversity to exploit.
+
+On a CUDA 12.x RTX 4090 RunPod, run the models sequentially with:
+
+```bash
+cd /workspace/SemREAcc
+export HF_HOME=/workspace/huggingface-cache
+SEMRE_CUDA_VARIANT=cu129 scripts/bootstrap_vllm.sh
+scripts/run_small_model_ensemble.sh
+```
+
+The bootstrap command rebuilds the environment, so deactivate an already-active
+`.venv` before running it. The ensemble wrapper downloads each missing model,
+starts and stops its vLLM server, completes the same dataset, and then performs
+the offline vote. Override concurrency if necessary with, for example,
+`CONCURRENCY=16 scripts/run_small_model_ensemble.sh`.
+
+The concise comparison is
+`results/ensemble-small-4b/summary_core.csv`. The same directory also
+contains detailed JSON metrics and row-level predictions. Package every input
+and ensemble output for download with:
+
+```bash
+tar -czf ensemble-small-4b-results.tar.gz \
+  results/ensemble-qwen35-4b \
+  results/ensemble-phi4-mini-3.8b \
+  results/ensemble-ministral3-3b \
+  results/ensemble-small-4b
+```
+
 ## Reproducibility choices
 
 - The default is greedy decoding (`temperature=0`, `seed=0`) with a 16-token
   ceiling and the same system instruction for both methods.
 - Qwen3.5, GLM-4.7, and GLM-4.5 thinking is disabled through each model's
-  chat-template request option. Kimi uses its default instruction template.
+  chat-template request option. Phi-4-mini, Ministral, and Kimi use their
+  default instruction templates.
 - Every unique atom is queried once per model and reused across names. There is
   no short-circuiting, so all models receive exactly the same atomic workload.
 - Three-valued logic propagates an invalid atomic response only when the other

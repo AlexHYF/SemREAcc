@@ -47,6 +47,36 @@
       "chat_template_kwargs": {"enable_thinking": false}
     }
   },
+  "phi4-mini-3.8b": {
+    "model_id": "microsoft/Phi-4-mini-instruct",
+    "architecture": "dense",
+    "total_parameters_b": 3.8,
+    "active_parameters_b": 3.8,
+    "precision": "BF16",
+    "recommended_tensor_parallel_size": 1,
+    "vllm_args": [
+      "--dtype", "bfloat16",
+      "--max-model-len", "4096",
+      "--trust-remote-code"
+    ],
+    "transformers_args": [
+      "--trust-remote-code"
+    ],
+    "request_extra_body": {}
+  },
+  "ministral3-3b": {
+    "model_id": "mistralai/Ministral-3-3B-Instruct-2512-BF16",
+    "architecture": "dense",
+    "total_parameters_b": 4,
+    "active_parameters_b": 4,
+    "precision": "BF16",
+    "recommended_tensor_parallel_size": 1,
+    "vllm_args": [
+      "--dtype", "bfloat16",
+      "--max-model-len", "4096"
+    ],
+    "request_extra_body": {}
+  },
   "qwen35-9b": {
     "model_id": "Qwen/Qwen3.5-9B",
     "architecture": "dense",
