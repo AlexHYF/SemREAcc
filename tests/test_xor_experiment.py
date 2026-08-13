@@ -73,7 +73,7 @@ class MetricTests(unittest.TestCase):
 class ManifestTests(unittest.TestCase):
     def test_all_requested_models_build_vllm_commands(self) -> None:
         models = json.loads((ROOT / "configs" / "models.json").read_text())
-        self.assertEqual(len(models), 12)
+        self.assertEqual(len(models), 14)
         for config in models.values():
             command = serve_model.build_command(
                 config,
@@ -87,7 +87,7 @@ class ManifestTests(unittest.TestCase):
 
     def test_ensemble_models_have_similar_sizes_and_distinct_families(self) -> None:
         models = json.loads((ROOT / "configs" / "models.json").read_text())
-        keys = ("qwen35-4b", "phi4-mini-3.8b", "ministral3-3b")
+        keys = ("qwen35-4b", "gemma3-4b", "llama32-3b")
         sizes = [models[key]["total_parameters_b"] for key in keys]
         publishers = {models[key]["model_id"].split("/", 1)[0] for key in keys}
         self.assertLessEqual(max(sizes) - min(sizes), 1.0)

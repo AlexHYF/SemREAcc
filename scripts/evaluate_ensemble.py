@@ -422,7 +422,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--dataset", choices=("core", "full"), default="core")
     parser.add_argument("--results-root", type=Path, default=ROOT / "results")
-    parser.add_argument("--output-run", default="ensemble-small-4b")
+    parser.add_argument("--output-run", default="ensemble-qwen-gemma-llama")
     return parser.parse_args()
 
 

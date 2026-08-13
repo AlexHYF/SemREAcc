@@ -47,6 +47,33 @@
       "chat_template_kwargs": {"enable_thinking": false}
     }
   },
+  "gemma3-4b": {
+    "model_id": "google/gemma-3-4b-it",
+    "architecture": "dense",
+    "total_parameters_b": 4,
+    "active_parameters_b": 4,
+    "precision": "BF16",
+    "recommended_tensor_parallel_size": 1,
+    "vllm_args": [
+      "--dtype", "bfloat16",
+      "--max-model-len", "4096",
+      "--language-model-only"
+    ],
+    "request_extra_body": {}
+  },
+  "llama32-3b": {
+    "model_id": "meta-llama/Llama-3.2-3B-Instruct",
+    "architecture": "dense",
+    "total_parameters_b": 3.21,
+    "active_parameters_b": 3.21,
+    "precision": "BF16",
+    "recommended_tensor_parallel_size": 1,
+    "vllm_args": [
+      "--dtype", "bfloat16",
+      "--max-model-len", "4096"
+    ],
+    "request_extra_body": {}
+  },
   "phi4-mini-3.8b": {
     "model_id": "microsoft/Phi-4-mini-instruct",
     "architecture": "dense",

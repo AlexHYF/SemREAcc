@@ -7,7 +7,7 @@ cd "$repo_root"
 dataset="${DATASET:-core}"
 concurrency="${CONCURRENCY:-32}"
 run_prefix="${RUN_PREFIX:-ensemble}"
-ensemble_run="${ENSEMBLE_RUN_NAME:-ensemble-small-4b}"
+ensemble_run="${ENSEMBLE_RUN_NAME:-ensemble-qwen-gemma-llama}"
 
 if [[ "$dataset" != "core" && "$dataset" != "full" ]]; then
   echo "DATASET must be core or full" >&2
@@ -26,7 +26,7 @@ if [[ ! "$ensemble_run" =~ ^[A-Za-z0-9._-]+$ ]]; then
   exit 2
 fi
 
-models=(qwen35-4b phi4-mini-3.8b ministral3-3b)
+models=(qwen35-4b gemma3-4b llama32-3b)
 runs=()
 for model_key in "${models[@]}"; do
   run_name="${run_prefix}-${model_key}"
