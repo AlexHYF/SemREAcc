@@ -31,7 +31,8 @@ runs=()
 for model_key in "${models[@]}"; do
   run_name="${run_prefix}-${model_key}"
   runs+=("$run_name")
-  SERVER_LOG="$repo_root/results/$run_name/server.log" \
+  INFERENCE_BACKEND=transformers \
+    SERVER_LOG="$repo_root/results/$run_name/server.log" \
     scripts/run_model_experiment.sh "$model_key" \
     --dataset "$dataset" \
     --concurrency "$concurrency" \

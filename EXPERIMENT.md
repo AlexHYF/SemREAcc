@@ -248,22 +248,22 @@ Gemma 3 and Llama 3.2 are gated Hugging Face repositories. Accept the terms on
 their checkpoint pages before starting, then export a Hugging Face read token
 as `HF_TOKEN` (or authenticate with `hf auth login`).
 
-On a CUDA 12.4 RTX 4090 RunPod, run the models sequentially with the
-Transformers serving fallback:
+On a CUDA 12.4 RTX 4090 RunPod, build the dedicated Hugging Face Transformers
+environment and run the models sequentially:
 
 ```bash
 cd /workspace/SemREAcc
 export HF_HOME=/workspace/huggingface-cache
 export HF_TOKEN=hf_your_read_token
-SEMRE_CUDA_VARIANT=cu124 scripts/bootstrap_vllm.sh
-scripts/run_small_model_ensemble.sh
+scripts/bootstrap_transformers.sh
+CONCURRENCY=16 scripts/run_small_model_ensemble.sh
 ```
 
 The bootstrap command rebuilds the environment, so deactivate an already-active
 `.venv` before running it. The ensemble wrapper downloads each missing model,
 starts and stops its Transformers server, completes the same dataset, and then
-performs the offline vote. Override concurrency if necessary with, for example,
-`CONCURRENCY=16 scripts/run_small_model_ensemble.sh`.
+performs the offline vote. The wrapper explicitly selects Transformers even if
+vLLM is installed elsewhere. Adjust `CONCURRENCY` only if necessary.
 
 The concise comparison is
 `results/ensemble-qwen-gemma-llama/summary_core.csv`. The same directory also

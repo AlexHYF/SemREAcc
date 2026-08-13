@@ -40,11 +40,13 @@ case "$cuda_variant" in
     # Current vLLM wheels no longer target CUDA 12.4, while the older cu124
     # vLLM releases predate Qwen3.5. Use Transformers' OpenAI-compatible
     # evaluation server only when this compatibility fallback is requested
-    # explicitly. CUDA 12.x hosts normally use the faster cu129 vLLM path.
+    # explicitly. --torch-backend selects the PyTorch wheel without replacing
+    # PyPI, which remains necessary for NVIDIA runtime dependencies.
+    # CUDA 12.x hosts normally use the faster cu129 vLLM path.
     uv pip install --python .venv/bin/python \
       torch==2.6.0 \
       torchvision==0.21.0 \
-      --index-url https://download.pytorch.org/whl/cu124
+      --torch-backend=cu124
     uv pip install --python .venv/bin/python \
       'transformers[serving] @ git+https://github.com/huggingface/transformers.git@main' \
       'requests>=2.32'
