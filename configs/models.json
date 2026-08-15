@@ -45,7 +45,9 @@
     ],
     "request_extra_body": {
       "chat_template_kwargs": {"enable_thinking": false}
-    }
+    },
+    "transformers_model_class": "AutoModelForMultimodalLM",
+    "transformers_processor_class": "AutoProcessor"
   },
   "gemma3-4b": {
     "model_id": "google/gemma-3-4b-it",
@@ -89,7 +91,8 @@
     "transformers_args": [
       "--trust-remote-code"
     ],
-    "request_extra_body": {}
+    "request_extra_body": {},
+    "transformers_model_class": "AutoModelForCausalLM"
   },
   "ministral3-3b": {
     "model_id": "mistralai/Ministral-3-3B-Instruct-2512-BF16",
@@ -102,7 +105,10 @@
       "--dtype", "bfloat16",
       "--max-model-len", "4096"
     ],
-    "request_extra_body": {}
+    "request_extra_body": {},
+    "transformers_model_class": "AutoModelForImageTextToText",
+    "transformers_processor_class": "MistralCommonBackend",
+    "expected_transformers_tokenizer_class": "MistralCommonBackend"
   },
   "qwen35-9b": {
     "model_id": "Qwen/Qwen3.5-9B",

@@ -278,6 +278,46 @@ tar -czf ensemble-qwen-gemma-llama-results.tar.gz \
   results/ensemble-qwen-gemma-llama
 ```
 
+## Atomic-query ROC experiment
+
+This experiment measures confidence on the four atomic predicates separately:
+Chinese given name, Japanese given name, Chinese surname, and Japanese surname.
+For each prompt it compares the fixed `YES` and `NO` answer tokens and uses
+`log P(YES) - log P(NO)` as the decision score. This is a direct next-token
+logit difference when both labels are single tokens; the runner automatically
+sums token log-probabilities if a tokenizer splits either label. Sweeping a
+threshold over that score produces one ROC curve and AUC per predicate; score
+zero is also reported as the default constrained `YES`/`NO` operating point.
+
+The existing generated-label results do not contain these token probabilities,
+so the atomic queries must be run again. By default the wrapper runs
+`qwen35-4b`, `phi4-mini-3.8b`, and `ministral3-3b`, matching the three models in
+`ensemble.tar.gz`. On a CUDA 12.4 machine, bootstrap and launch the full run with:
+
+```bash
+scripts/bootstrap_transformers.sh
+BATCH_SIZE=8 scripts/run_atomic_roc_experiment.sh
+```
+
+To verify all three loaders on a fresh GPU before the full run, use
+`LIMIT_PER_CLASS=1 scripts/run_atomic_roc_experiment.sh`. This scores eight
+balanced atoms per model; the later full command resumes those checkpoints.
+
+The ROC runner loads each model directly with Hugging Face Transformers; do not
+start a vLLM or HTTP server. Missing checkpoints are downloaded automatically
+and cached by Hugging Face. Atomic scores are checkpointed after every batch,
+so rerunning the same command resumes an interrupted run. The bootstrap pins
+the Transformers source revision and `mistral-common` tokenizer version used by
+the score protocol.
+
+Per-model scores, ROC points, summaries, and SVG plots are written below
+`results/atomic-roc/MODEL_KEY/`. The same root also contains the combined
+cross-model summary and plot. Package the complete result for download with:
+
+```bash
+tar -czf atomic-roc-results.tar.gz results/atomic-roc
+```
+
 ## Reproducibility choices
 
 - The default is greedy decoding (`temperature=0`, `seed=0`) with a 16-token

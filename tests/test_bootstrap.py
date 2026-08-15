@@ -24,6 +24,8 @@ class BootstrapTests(unittest.TestCase):
         )
 
         self.assertIn("transformers[serving]", bootstrap)
+        self.assertIn("TRANSFORMERS_REVISION", bootstrap)
+        self.assertIn("mistral-common==1.11.7", bootstrap)
         self.assertIn("--torch-backend=cu124", bootstrap)
         self.assertNotIn("\n  vllm", bootstrap)
         self.assertIn("INFERENCE_BACKEND=transformers", runner)
