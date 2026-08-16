@@ -291,8 +291,11 @@ zero is also reported as the default constrained `YES`/`NO` operating point.
 
 The existing generated-label results do not contain these token probabilities,
 so the atomic queries must be run again. By default the wrapper runs
-`qwen35-4b`, `phi4-mini-3.8b`, and `ministral3-3b`, matching the three models in
-`ensemble.tar.gz`. On a CUDA 12.4 machine, bootstrap and launch the full run with:
+`qwen35-4b`, `gemma3-4b`, and `llama32-3b`, matching the previous Qwen/Gemma/Llama
+ensemble in `ensemble-qwen-gemma-llama-results.tar.gz`. Gemma 3 and Llama 3.2
+are gated Hugging Face repositories, so accept their licenses and export a
+read-enabled `HF_TOKEN` first. On a CUDA 12.4 machine, bootstrap and launch the
+full run with:
 
 ```bash
 scripts/bootstrap_transformers.sh
@@ -307,8 +310,7 @@ The ROC runner loads each model directly with Hugging Face Transformers; do not
 start a vLLM or HTTP server. Missing checkpoints are downloaded automatically
 and cached by Hugging Face. Atomic scores are checkpointed after every batch,
 so rerunning the same command resumes an interrupted run. The bootstrap pins
-the Transformers source revision and `mistral-common` tokenizer version used by
-the score protocol.
+the Transformers source revision used by the score protocol.
 
 Per-model scores, ROC points, summaries, and SVG plots are written below
 `results/atomic-roc/MODEL_KEY/`. The same root also contains the combined

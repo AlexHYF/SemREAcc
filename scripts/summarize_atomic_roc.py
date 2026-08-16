@@ -16,7 +16,7 @@ from run_atomic_roc import COLORS, QUERY_ORDER, QUERY_TITLES, write_roc_svg
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_ROOT = ROOT / "results" / "atomic-roc"
-DEFAULT_RUNS = ("qwen35-4b", "phi4-mini-3.8b", "ministral3-3b")
+DEFAULT_RUNS = ("qwen35-4b", "gemma3-4b", "llama32-3b")
 COMPATIBILITY_FIELDS = (
     "dataset_sha256",
     "score_version",

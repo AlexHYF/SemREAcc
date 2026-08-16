@@ -368,6 +368,29 @@ class ModelLoaderTests(unittest.TestCase):
         self.assertTrue(model.evaluated)
 
 
+class DefaultModelTests(unittest.TestCase):
+    def test_roc_defaults_match_previous_qwen_gemma_llama_ensemble(self) -> None:
+        expected = ("qwen35-4b", "gemma3-4b", "llama32-3b")
+        self.assertEqual(summarize_roc.DEFAULT_RUNS, expected)
+
+        runner = (ROOT / "scripts" / "run_atomic_roc_experiment.sh").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            "MODEL_KEYS:-qwen35-4b gemma3-4b llama32-3b", runner
+        )
+
+    def test_gemma_uses_multimodal_transformers_loaders(self) -> None:
+        configs = json.loads(
+            (ROOT / "configs" / "models.json").read_text(encoding="utf-8")
+        )
+        gemma = configs["gemma3-4b"]
+        self.assertEqual(
+            gemma["transformers_model_class"], "AutoModelForMultimodalLM"
+        )
+        self.assertEqual(gemma["transformers_processor_class"], "AutoProcessor")
+
+
 class DatasetTests(unittest.TestCase):
     def test_atomic_dataset_has_four_balanced_roc_groups(self) -> None:
         dataset = ROOT / "data" / "xor_names" / "individual_queries.csv"

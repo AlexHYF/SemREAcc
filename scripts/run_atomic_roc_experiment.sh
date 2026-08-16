@@ -10,7 +10,7 @@ output_root="${OUTPUT_ROOT:-results/atomic-roc}"
 device="${DEVICE:-cuda}"
 dtype="${DTYPE:-bfloat16}"
 limit_per_class="${LIMIT_PER_CLASS:-}"
-model_keys_text="${MODEL_KEYS:-qwen35-4b phi4-mini-3.8b ministral3-3b}"
+model_keys_text="${MODEL_KEYS:-qwen35-4b gemma3-4b llama32-3b}"
 
 if [[ ! -x "$python_bin" ]]; then
   echo "Missing $python_bin. Run scripts/bootstrap_transformers.sh first." >&2
@@ -52,8 +52,8 @@ for model_key in "${models[@]}"; do
 done
 
 if ! "$python_bin" -c \
-  'import mistral_common, torch, transformers; print(f"torch {torch.__version__}; transformers {transformers.__version__}; mistral-common {mistral_common.__version__}")'; then
-  echo "PyTorch, Transformers, and mistral-common are required. Run scripts/bootstrap_transformers.sh first." >&2
+  'import torch, transformers; print(f"torch {torch.__version__}; transformers {transformers.__version__}")'; then
+  echo "PyTorch and Transformers are required. Run scripts/bootstrap_transformers.sh first." >&2
   exit 2
 fi
 
